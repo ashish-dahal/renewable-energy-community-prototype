@@ -1,0 +1,55 @@
+version: '3.7'
+
+services:
+  user-interface-grafana:
+    image: grafana/grafana
+    container_name: user-interface-grafana
+    volumes:
+      - ./user-interface-grafana:/var/lib/grafana
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - pesco
+    depends_on:
+      - mqtt_broker
+
+  mqtt_broker:
+    image: eclipse-mosquitto:2.0.10
+    container_name: mqtt_broker
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    restart: always
+    ports:
+      - 1883:1883
+    networks:
+      - pesco
+  # predictive_analytics:
+  #   image: python:3.7
+  #   container_name: predictive_analytics
+  #   ports:
+  #     - 8081:8080
+  #   networks:
+  #     - pesco
+  #   command: tail -f /dev/null
+
+  # energy_aggregator:
+  #   image: python:3.7
+  #   container_name: energy_aggregator
+  #   ports:
+  #     - 8082:8080
+  #   networks:
+  #     - pesco
+  #   command: tail -f /dev/null
+
+  # dynamic-price-calculator:
+  #   image: python:3.7
+  #   container_name: calculator
+  #   ports:
+  #     - 8083:8080
+  #   networks:
+  #     - pesco
+  #   command: tail -f /dev/null
+
+networks:
+  pesco:

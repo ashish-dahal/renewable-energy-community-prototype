@@ -1,0 +1,35 @@
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+{
+  "manifestVersion": "2.0.0",
+  "signatureType": "grafana",
+  "signedByOrg": "grafana",
+  "signedByOrgName": "Grafana Labs",
+  "plugin": "grafana-mqtt-datasource",
+  "version": "1.0.0-beta.1",
+  "time": 1669909156918,
+  "keyId": "7e4d0c6a708866e7",
+  "files": {
+    "CHANGELOG.md": "33ed6e5255eed34d7fb7927d5f27b26626ae3c2a883019c38d8dc9bab8f66d0c",
+    "LICENSE": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "README.md": "ab8c8bbc131cf337ee9d0a815bbbbf5b045817eb9d8feaf7b245b36c1003c451",
+    "gpx_mqtt_linux_amd64": "b675fe89f8834a27fd9e214c5a26ac6348ee4abe03dac0de702c14e490bc5869",
+    "img/mqtt.svg": "7ac93155caab0bcc21e3956694d9702bd4772b889e3e04bf865caa368fc7da05",
+    "module.js": "b88ed8633354d40a2392be35a525837ce7e9e531364e33a3a58040d3d4ea34c7",
+    "module.js.map": "f6ed4d6024a456283e4c48c60db656b32d2ba5f4bd1b3b8d32410508ea1190fa",
+    "plugin.json": "8a2f0530969d68b1ec86f2499bfaebb50e7438fc641d214b0f8c2f11a1db3dab"
+  }
+}
+-----BEGIN PGP SIGNATURE-----
+Version: OpenPGP.js v4.10.10
+Comment: https://openpgpjs.org
+
+wrgEARMKAAYFAmOIyqUAIQkQfk0ManCIZucWIQTzOyW2kQdOhGNlcPN+TQxq
+cIhm53fqAgkBxiLxfC92H7oFx7aKpoRUTf4KGSP4SGHeoUYc5OyR1T3EyG00
+vDreXXAgyvg+d/aLFwY9d0jMvwbLnhlzBU+xPvkCCM702/+tjlvHuYd992ec
+FWKsMxVzvzp+NQveQSglEYaFUANa+ZGaX5z6lc1tZt402sBHIV5yhHKd/n9g
+RUTxSoUR
+=RPvP
+-----END PGP SIGNATURE-----
