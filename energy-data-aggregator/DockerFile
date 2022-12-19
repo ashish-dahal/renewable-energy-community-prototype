@@ -1,0 +1,15 @@
+# docker file for dynamic-price-calculator.py
+
+FROM python:3.7.9-alpine3.9
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN pip install -r /tmp/requirements.txt
+
+COPY . /app
+
+WORKDIR /app
+
+EXPOSE 8080
+
+CMD ["python", "energy-data-aggregator.py"]
