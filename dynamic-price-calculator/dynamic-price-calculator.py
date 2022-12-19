@@ -25,7 +25,8 @@ class DynamicPriceCalculator:
         self.price = 0
 
     def get_optimal_price(self, consumer_consumption, producer_production):
-        '''Calculate the optimal price for a electricity using the Nash Bargaining Solution.
+        '''
+        Calculate the optimal price for a electricity using the Nash Bargaining Solution.
 
         Parameters:
             consumer_consumption (list): the consumption of each consumer in kWh
@@ -75,12 +76,14 @@ class DynamicPriceCalculator:
 
     # function to subscribe to get the consumption and production of each consumer and producer
     def on_connect(self, client, userdata, flags, rc):
+        '''The callback for when the client receives a CONNACK response from the server.'''
         print("Connected with result code "+str(rc))
         client.subscribe("consumption")
         client.subscribe("production")
 
     # function to receive the consumption and production of each consumer and producer
     def on_message(self, client, userdata, msg):
+        '''The callback for when a PUBLISH message is received from the server.'''
         print(msg.topic+": "+str(msg.payload))
         if msg.topic == "consumption":
             self.consumer_consumption = msg.payload
@@ -96,9 +99,11 @@ class DynamicPriceCalculator:
 
     # function to publish the optimal price
     def publish_price(self):
+        '''Publish the optimal price.'''
         self.client.publish("price", self.price)
 
     def start(self):
+        '''Start the dynamic price calculator.'''
         # set the callback functions
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
@@ -106,45 +111,6 @@ class DynamicPriceCalculator:
         # connect to the broker
         self.client.connect("mqtt_broker", 1883, 60)
         self.client.loop_forever()
-
-
-def simulate_electricity_consumption(consumption_rate, generation_rate, consumption_fluctuation, generation_fluctuation, interval):
-    # Set the initial electricity consumption in kWh
-    electricity_consumed = 0
-
-    consumption_data = []
-
-    for i in range(366):
-        # Calculate the daily electricity consumption
-        electricity_consumed = consumption_rate + \
-            random.uniform(0, consumption_fluctuation)
-        consumption_data.append(electricity_consumed)
-
-    return consumption_data
-
-
-def get_datetime_range(interval: timedelta) -> list:
-    # get the current datetime
-    now = datetime.now()
-
-    # calculate the datetime one year ago
-    one_year_ago = now - timedelta(days=365)
-
-    # initialize the result list with the datetime one year ago
-    result = [one_year_ago]
-
-    # initialize a variable to keep track of the current datetime
-    current = one_year_ago
-
-    # loop until the current datetime is the same as the current datetime
-    while current < now:
-        # add the interval to the current datetime
-        current += interval
-
-        # append the current datetime to the result list
-        result.append(current)
-
-    return result
 
 
 if __name__ == "__main__":
@@ -158,13 +124,7 @@ if __name__ == "__main__":
     timestamps = get_datetime_range(timedelta(days=1))
 
     # start the dynamic price calculator
-    for i in range(366):
-        # simulate the consumption and production of each consumer and producer
-        con = simulate_electricity_consumption(4, 3, 0.5, 0.5, 1)
-        prod = simulate_electricity_consumption(4, 3, 0.5, 0.5, 1)
-
-        # calculate the optimal price
-        prices.append(dynamic_price_calculator.get_optimal_price(con, prod))
+    dynamic_price_calculator.start()
 
     # print prices on matplotlib
     # import matplotlib.pyplot as plt
