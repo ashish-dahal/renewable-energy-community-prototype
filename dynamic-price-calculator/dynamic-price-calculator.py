@@ -1,17 +1,21 @@
-from datetime import datetime, timedelta
 import paho.mqtt.client as mqtt
-import time
-import random
-import matplotlib.dates as mdates
+import json
 
 
 class DynamicPriceCalculator:
-    '''A class to calculate the optimal price for a electricity using the Nash Bargaining Solution.'''
+    '''
+    A class to calculate the optimal price for a electricity using the Nash Bargaining Solution.
 
-    def __init__(self):
+    Parameters:
+        min_price (float): minimum price for the electricity
+        broker_name (string): address for mqtt broker
+    '''
+
+    def __init__(self, min_price, broker_name):
 
         # initialize the mqtt client
         self.client = mqtt.Client()
+        self.client.connect(broker_name, 1883)
 
         # initialize the consumption and production of each consumer and producer
         self.consumer_consumption = None
@@ -20,6 +24,9 @@ class DynamicPriceCalculator:
         # initialize  the total consumption and production
         self.total_consumption = None
         self.total_production = None
+
+        # set minimum price
+        self.min_price = min_price
 
         # initialize the price with the Nash Bargaining Solution
         self.price = 0
@@ -32,7 +39,7 @@ class DynamicPriceCalculator:
             consumer_consumption (list): the consumption of each consumer in kWh
             producer_production (list): the production of each producer in kWh
 
-        Returns: the optimal price in euros
+        Returns: (float) the optimal price in euros
         '''
         # set  the consumption and production of each consumer and producer
         self.consumer_consumption = consumer_consumption
@@ -68,9 +75,10 @@ class DynamicPriceCalculator:
             # update the price
             self.price = new_price
 
-            # check if the new price is negative
-        if self.price < 0:
-            self.price = 2
+        # set the minimum price
+        if self.price < self.min_price:
+            self.price = self.min_price * 10
+
         # return the optimal price in euros
         return self.price/10
 
@@ -78,17 +86,20 @@ class DynamicPriceCalculator:
     def on_connect(self, client, userdata, flags, rc):
         '''The callback for when the client receives a CONNACK response from the server.'''
         print("Connected with result code "+str(rc))
-        client.subscribe("consumption")
-        client.subscribe("production")
+        client.subscribe("energy/aggregate/consumption")
+        client.subscribe("energy/aggregate/production")
 
     # function to receive the consumption and production of each consumer and producer
     def on_message(self, client, userdata, msg):
         '''The callback for when a PUBLISH message is received from the server.'''
-        print(msg.topic+": "+str(msg.payload))
-        if msg.topic == "consumption":
-            self.consumer_consumption = msg.payload
-        elif msg.topic == "production":
-            self.producer_production = msg.payload
+
+        print("topic: " + msg.topic+"\n")
+        if msg.topic == "energy/aggregate/consumption":
+            self.consumer_consumption = json.loads(msg.payload)
+            print(self.consumer_consumption)
+        elif msg.topic == "energy/aggregate/production":
+            self.producer_production = json.loads(msg.payload)
+            print(self.producer_production)
 
         if self.consumer_consumption is not None and self.producer_production is not None:
             # calculate the optimal price
@@ -96,11 +107,13 @@ class DynamicPriceCalculator:
                 self.consumer_consumption, self.producer_production)
             # publish the optimal price
             self.publish_price()
+            print("price:", self.price)
 
     # function to publish the optimal price
     def publish_price(self):
         '''Publish the optimal price.'''
-        self.client.publish("price", self.price)
+        self.client.publish(
+            "energy/price", json.dumps({"price": self.price}))
 
     def start(self):
         '''Start the dynamic price calculator.'''
@@ -108,38 +121,13 @@ class DynamicPriceCalculator:
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
 
-        # connect to the broker
-        self.client.connect("mqtt_broker", 1883, 60)
         self.client.loop_forever()
 
 
 if __name__ == "__main__":
     # create an instance of the class
-    dynamic_price_calculator = DynamicPriceCalculator()
-
-    # initialize the list of prices
-    prices = []
-
-    # get the timestamps for the last year
-    timestamps = get_datetime_range(timedelta(days=1))
+    dynamic_price_calculator = DynamicPriceCalculator(
+        min_price=2, broker_name="mqtt_broker")
 
     # start the dynamic price calculator
     dynamic_price_calculator.start()
-
-    # print prices on matplotlib
-    # import matplotlib.pyplot as plt
-    # import pandas as pd
-
-    # Create a figure and a set of subplots
-    # fig, ax = plt.subplots()
-
-    # create a line chart for each data series
-    # ax.plot(timestamps, pd.Series(prices).rolling(90).mean() /
-    #         pd.Series(prices).rolling(90).mean().min(), color='red')
-    # ax.plot(timestamps, pd.Series(con).rolling(90).mean() /
-    #         pd.Series(con).rolling(90).mean().min(), color='green')
-    # ax.plot(timestamps, pd.Series(prod).rolling(90).mean() /
-    #         pd.Series(prod).rolling(90).mean().min(), color='blue')
-
-    # Show the plot
-    # plt.show()
