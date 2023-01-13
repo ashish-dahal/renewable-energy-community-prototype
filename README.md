@@ -13,6 +13,7 @@ The components are implemented as seperate docker containers. The data exchange 
 #### To run the docker containers, from the terminal:
 - From the root of the project, run `docker compose build`
 - Run `docker compose up`
+- The ML model for predictive-analytics-service can be downloaded from [here](https://drive.google.com/file/d/1BqNw37ZmCBRN_Y9FP4nulcVOi-4rikaN/view?usp=share_link). Place it on the predictive-analytics-service folder.
 
 #### Containers Description:
 - `mqtt-broker`: It allows publish-subscribe mechanism for data exchange through paho-mqtt python library. The mqtt topics are:
