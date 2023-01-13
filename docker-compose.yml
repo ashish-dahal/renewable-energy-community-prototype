@@ -36,15 +36,6 @@ services:
     networks:
       - pesco
 
-  # predictive_analytics:
-  #   image: python:3.7
-  #   container_name: predictive_analytics
-  #   ports:
-  #     - 8081:8080
-  #   networks:
-  #     - pesco
-  #   command: tail -f /dev/null
-
   energy-data-aggregator:
     build: energy-data-aggregator
     container_name: energy-data-aggregator
@@ -60,6 +51,16 @@ services:
     container_name: dynamic-price-calculator
     ports:
       - 8083:8080
+    networks:
+      - pesco
+    depends_on:
+      - mqtt_broker
+
+  predictive-analytics-service:
+    build: predictive-analytics-service
+    container_name: predictive-analytics-service
+    ports:
+      - 8081:8080
     networks:
       - pesco
     depends_on:

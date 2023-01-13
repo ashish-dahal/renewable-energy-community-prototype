@@ -1,6 +1,6 @@
-# docker file for dynamic-price-calculator.py
+# docker file for energy-data-aggregator.py
 
-FROM python:3.7-alpine3.9
+FROM python:3.7
 
 COPY requirements.txt /tmp/requirements.txt
 
